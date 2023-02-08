@@ -246,6 +246,8 @@ module Zypper
                 else
                   distro = distro[-3].gsub('_', ' ')
                 end
+                distro = distro =~ /^\d\d.\d$/ ? "openSUSE Leap #{distro}" : distro
+
                 res[:versions] << {
                   distro: distro, #link.split('/')[-3].gsub('_', ' '),
                   format: File.basename(link).split('.')[-2].to_sym,
@@ -269,7 +271,7 @@ module Zypper
           def data
             res = { versions: [] }
 
-            distro = @page.xpath(XPATH_LINK_DISTRO).text
+            distro = @page.xpath(XPATH_LINK_DISTRO).text.gsub(/\_/, ' ')
 
             #link = @page.xpath(XPATH_LINK_BIN).text
             #res[:versions] << { format: File.basename(link).split('.')[-2].to_sym, link: URL + link }
