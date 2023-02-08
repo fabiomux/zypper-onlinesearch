@@ -15,7 +15,7 @@ GEM
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     racc (1.6.2)
-    rake (10.5.0)
+    rake (12.3.3)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -35,7 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 2.0)
-  rake (~> 10.0)
+  rake (~> 12.0)
   rspec (~> 3.0)
   zypper-onlinesearch!
 
