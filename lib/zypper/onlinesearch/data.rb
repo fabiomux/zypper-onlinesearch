@@ -115,9 +115,6 @@ module Zypper
           XPATH_EXPERIMENTAL_LINK = './/@href'
           XPATH_EXPERIMENTAL_VERSION = '../..//div[@class="col-md-2"]'
 
-          #Mancano le distro non più supportate...
-
-
           def data
             res = {}
 
@@ -165,9 +162,7 @@ module Zypper
               #puts repo, link, format
               link = expand_link(pack.xpath(xpath_link).text)
 
-              #puts ver.text, repo, res[:versions], format, link,'-', @old_repo
               if repo =~ /Expert Download/
-                #res[:versions] << { distro: ver.text, link: link, type: type, repo: res[:versions].last[:repo], format: :extra, version: version}
                 res[:versions] << { distro: ver.text, link: link, type: type, repo: @old_repo, format: :extra, version: version}
                 next
               end
@@ -222,7 +217,6 @@ module Zypper
 
             res
           end
-
         end
 
       end
@@ -249,7 +243,7 @@ module Zypper
                 distro = distro =~ /^\d\d.\d$/ ? "openSUSE Leap #{distro}" : distro
 
                 res[:versions] << {
-                  distro: distro, #link.split('/')[-3].gsub('_', ' '),
+                  distro: distro,
                   format: File.basename(link).split('.')[-2].to_sym,
                   link: link
                 }
@@ -273,8 +267,6 @@ module Zypper
 
             distro = @page.xpath(XPATH_LINK_DISTRO).text.gsub(/\_/, ' ')
 
-            #link = @page.xpath(XPATH_LINK_BIN).text
-            #res[:versions] << { format: File.basename(link).split('.')[-2].to_sym, link: URL + link }
             @page.xpath(XPATH_LINK_BIN).each do |pack|
               link = pack.text
               res[:versions] << {
@@ -305,7 +297,6 @@ module Zypper
 
             res
           end
-
         end
 
       end

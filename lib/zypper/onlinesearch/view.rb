@@ -261,7 +261,6 @@ module Zypper
             puts (' ' * 5) + ' | Distribution: ' + args[:pack][:distro]
             puts (' ' * 5) + ' | Link: ' + args[:pack][:link]
 
-            #puts (' ' * 5) + ' |' + ( '-' * 94)
             self.separator
           end
         end

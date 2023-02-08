@@ -169,7 +169,7 @@ module Zypper
         (@formats == :compatible) ? @release.arch : :all
       end
 
-      def package_select?(package) #, distro = nil, repo = nil)
+      def package_select?(package)
         res = true
 
         if (@formats == :compatible)
@@ -181,7 +181,7 @@ module Zypper
         end
 
         if (@distributions == :compatible)
-          res = res && ((:current == package[:distro]) || (package[:distro].match?(Regexp.new(@release.pretty_name, 'i'))))
+          res = res && ((:current == package[:distro]) || package[:distro].match?(Regexp.new(@release.pretty_name, 'i')))
         end
 
         res = false unless @types.include?(package[:type])
