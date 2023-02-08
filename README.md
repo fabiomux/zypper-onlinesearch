@@ -1,39 +1,162 @@
-# Zypper::Onlinesearch
+# Zypper-Onlinesearch
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/zypper/onlinesearch`. To experiment with that code, run `bin/console` for an interactive prompt.
+Zypper-Onlinesearch brings the ability to find packages from *software.opensuse.org* and *Packman*,
+directly in your terminal.
 
-TODO: Delete this and the text above, and describe your gem
+Basically it is just a command-line frontend to these search engines, it executes a query to them,
+arrange the results and display them in a table or report view.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+There are a couple of options to install this application.
 
-```ruby
-gem 'zypper-onlinesearch'
+### Rubygem
+
+Install it as a regular Ruby gem with:
+```shell
+$ gem install zypper-onlinesearch
 ```
 
-And then execute:
+### From the openSUSE Build Service repository
 
-    $ bundle
+This application has been packaged in my personal OBS repository so you can install It
+as a common RPM package:
+- Add the repository URL in your list;
+- install the package from Yast or Zypper.
 
-Or install it yourself as:
-
-    $ gem install zypper-onlinesearch
+Being the repository URL slightly changing from a version to another, I included all the steps
+in the related [project page][project_page] at my blog.
 
 ## Usage
 
-TODO: Write usage instructions here
+To query for the string :
+```shell
+$ onlinesearch -s <string>
+```
 
-## Development
+When the pages are returnerd they are identified in the *Page* field and can be read with the `-p` switch:
+```shell
+$ onlinesearch -p <page>
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+To list the links from that page:
+```shell
+$ onlinesearch -l <page>,<link_number>
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+For example looking for *Qmmp*:
+```shell
+$ onlinesearch -s qmmp
 
-## Contributing
+====================================================================================================
+Parameters: Engine: packman | Query: qmmp | Cache: On (2023-02-23 16:37)
+====================================================================================================
+    # |       Page       | Description 
+----------------------------------------------------------------------------------------------------
+    1 | qmmp             | Qt-based Multimedia Player
+----------------------------------------------------------------------------------------------------
+    2 | qmmp-plugin-pack | Extra plugins for Qmmp
+----------------------------------------------------------------------------------------------------
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/zypper-onlinesearch. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+====================================================================================================
+Parameters: Engine: opensuse | Query: qmmp | Cache: On (2023-02-23 16:37)
+====================================================================================================
+    # |              Page              | Description 
+----------------------------------------------------------------------------------------------------
+    1 | qmmp                            | Qt-based Multimedia Player
+----------------------------------------------------------------------------------------------------
+    2 | libqmmp1                        | Qmmp library
+----------------------------------------------------------------------------------------------------
+    3 | libqmmp-devel                   | Development files for libqmmp
+----------------------------------------------------------------------------------------------------
+...
+```
 
-## Code of Conduct
+We get among the results a page called *qmmp* for both engines, so to read that pages:
+```shell
+$ onlinesearch -p qmmp
 
-Everyone interacting in the Zypper::Onlinesearch project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/zypper-onlinesearch/blob/master/CODE_OF_CONDUCT.md).
+====================================================================================================
+Parameters:  Engine: packman | OS: openSUSE Leap 15.4 | Architecture: 64 Bit | Cache: On (2023-02-07 16:57)
+====================================================================================================
+Name:        qmmp
+Summary:     
+Description: 
+Qt-based Multimedia Player
+----------------------------------------------------------------------------------------------------
+    # | Version |  Repo   |        Distro       
+----------------------------------------------------------------------------------------------------
+    1 |   2.1.2 | Packman | openSUSE Leap 15.4
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+Parameters:  Engine: opensuse | OS: openSUSE Leap 15.4 | Architecture: 64 Bit | Cache: On (2023-02-07 16:57)
+====================================================================================================
+Name:        qmmp
+Summary:     Qt-based Multimedia Player
+Description: This program is an audio-player, written with help of Qt library.
+----------------------------------------------------------------------------------------------------
+    # | Version |         Repo          |        Distro       
+----------------------------------------------------------------------------------------------------
+    1 |   2.1.2 | home:plater           | openSUSE Leap 15.4
+----------------------------------------------------------------------------------------------------
+    2 |   1.4.4 | home:ykoba:multimedia | openSUSE Leap 15.4
+----------------------------------------------------------------------------------------------------
+    3 |   2.1.2 | multimedia:apps       | openSUSE Leap 15.4
+----------------------------------------------------------------------------------------------------
+```
+
+To show the page from one engine only, just append the `--engine <engine_name>` param:
+```shell
+$ onlinesearch -p qmmp --engine opensuse
+```
+
+To list the links in the third repository listed in the *opensuse* engine:
+```shell
+$ onlinesearch -l qmmp,3 --engine opensuse
+
+====================================================================================================
+Parameters:  Engine: opensuse | OS: openSUSE Leap 15.4 | Architecture: 64 Bit | Cache: On (2023-02-07 16:57)
+====================================================================================================
+Name:        qmmp
+Summary:     Qt-based Multimedia Player
+Description: This program is an audio-player, written with help of Qt library.
+----------------------------------------------------------------------------------------------------
+    # | Format | Link
+----------------------------------------------------------------------------------------------------
+    1 |    ymp | https://software.opensuse.org/ymp/multimedia:apps/15.4/qmmp.ymp?base=openSUSE%3ALeap%3A15.4&query=qmmp
+----------------------------------------------------------------------------------------------------
+    2 |    src | https://download.opensuse.org/repositories/multimedia:/apps/15.4/src/qmmp-2.1.2-lp154.182.3.src.rpm
+----------------------------------------------------------------------------------------------------
+    3 | x86_64 | https://download.opensuse.org/repositories/multimedia:/apps/15.4/x86_64/qmmp-2.1.2-lp154.182.3.x86_64.rpm
+----------------------------------------------------------------------------------------------------
+```
+
+To print only the raw URLs:
+```shell
+$ onlinesearch -l qmmp,3 --urls
+https://software.opensuse.org/ymp/multimedia:apps/15.4/qmmp.ymp?base=openSUSE%3ALeap%3A15.4&query=qmmp
+https://download.opensuse.org/repositories/multimedia:/apps/15.4/src/qmmp-2.1.2-lp154.182.3.src.rpm
+https://download.opensuse.org/repositories/multimedia:/apps/15.4/x86_64/qmmp-2.1.2-lp154.182.3.x86_64.rpm
+```
+
+And in case we are interested to a specific format:
+```shell
+$ onlinesearch -l qmmp,3 --urls --format ymp
+https://software.opensuse.org/ymp/multimedia:apps/15.4/qmmp.ymp?base=openSUSE%3ALeap%3A15.4&query=qmmp
+```
+
+## Get help
+
+Where to start:
+```shell
+$ onlinesearch --help
+```
+
+## More Help:
+
+More info is available at:
+- the [Zypper-Onlinesearch Project page][project_page].
+
+[project_page]: https://freeaptitude.altervista.org/projects/zypper-onlinesearch.html "Zypper-Onlinesearch project page"
+
