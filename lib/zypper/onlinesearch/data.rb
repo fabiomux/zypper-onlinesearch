@@ -5,10 +5,28 @@ module Zypper
 
     class PageData
 
-      FORMATS = { 'x86_64': '64 Bit', 'i586': '32 Bit', 'src': 'Source', 'ymp': '1 Click Install',
-                        'riscv64': 'riscv64', 'ppc': 'ppc', 'ppc64': 'ppc64', 'ppc64le': 'ppc64le', 'i686': 'i686',
-                        's390x': 's390x', 'armv6l': 'armv6l',  'armv7l': 'armv7l', 'lang': 'Language', 'extra': 'Extra',
-                        'aarch64': 'aarch64', 'aarch64_ilp32': 'aarch64_ilp32', 'all': 'all', 'noarch': 'noarch', 'lsrc': 'lang src' }
+      FORMATS = {
+        'aarch64': 'ARM v8.x 64-bit',
+        'aarch64_ilp32': 'ARM v8.x 64-bit ilp32 mode',
+        'all': 'All',
+        'armv6l': 'ARM v6',
+        'armv7l': 'ARM v7',
+        'extra': 'Extra',
+        'i586': 'Intel 32-bit',
+        'i686': 'Intel Pentium 32-bit',
+        'lang': 'Language',
+        'lsrc': 'Language source',
+        'noarch': 'No architecture',
+        'ppc64le': 'PowerPC 64-bit little-endian',
+        'ppc64': 'PowerPC 64-bit',
+        'ppc': 'PowerPC',
+        'repo': 'Repository',
+        'riscv64': 'Risc v64',
+        's390x': 'IBM System/390',
+        'src': 'Source',
+        'x86_64': 'Intel/AMD 64-bit',
+        'ymp': '1 Click Install',
+      }
 
       def initialize(page)
         @page = Nokogiri::HTML(page)
@@ -226,30 +244,47 @@ module Zypper
 
         class Opensuse < PageData
 
-          XPATH_LINK_BIN = '//*[@id="directopenSUSE"]//@href'
+          XPATH_REPO = '//*[@id="manualopenSUSE"]/h5'
+          XPATH_REPO_DISTRO = './strong[1]'
+          XPATH_REPO_LINK = 'following-sibling::pre[1]'
+
+          XPATH_PACKAGE_GROUP = '//*[@id="directopenSUSE"]/div/div'
+          XPATH_PACKAGE_DISTRO = './p/strong'
+          XPATH_PACKAGE_LINK = './/@href'
 
           def data
             res = { versions: [] }
 
-            @page.xpath(XPATH_LINK_BIN).each do |section|
-                link = section.text
-                #puts link
-                distro = link.split('/')
-                if distro[-3] == 'standard'
-                  distro = distro[3..-4].join(' ').delete(':')
-                else
-                  distro = distro[-3].gsub('_', ' ')
-                end
-                distro = distro =~ /^\d\d.\d$/ ? "openSUSE Leap #{distro}" : distro
-
-                res[:versions] << {
-                  distro: distro,
-                  format: File.basename(link).split('.')[-2].to_sym,
-                  link: link
-                }
-            end
+            extract(res, -1, XPATH_REPO, XPATH_REPO_DISTRO, XPATH_REPO_LINK)
+            extract(res, -2, XPATH_PACKAGE_GROUP, XPATH_PACKAGE_DISTRO, XPATH_PACKAGE_LINK)
 
             res
+          end
+
+
+          private
+
+          def extract(res, format_idx, xpath_group, xpath_distro, xpath_link)
+            @page.xpath(xpath_group).each do |section|
+              distro = ''
+              section.xpath(xpath_distro).each do |subsection|
+                distro = subsection.text
+                distro = "openSUSE Leap #{distro}" if distro =~ /^\d\d.\d$/
+              end
+
+              #p distro
+              section.xpath(xpath_link).each do |subsection|
+                link = subsection.text
+                link = link.gsub("\n", ' ').scan(/(https:\/\/[^ \n]+)/).pop.pop
+                res[:versions] << {
+                  distro: distro,
+                  format: File.basename(link).split('.')[format_idx].to_sym,
+                  link: link,
+                }
+                #p link
+              end
+            end
+
           end
         end
 
