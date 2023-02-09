@@ -29,7 +29,7 @@ module Zypper
           if ENV['ZYPPER_ONLINESEARCH']
             opt.banner = 'Usage: zypper onlinesearch [OPTIONS] [OPERATION]'
           else
-            opt.banner = 'Usage: zypper-onlinesearch [OPTIONS] [OPERATION]'
+            opt.banner = 'Usage: onlinesearch [OPTIONS] [OPERATION]'
           end
 
           opt.separator ''
@@ -59,7 +59,7 @@ module Zypper
           opt.separator ''
           opt.separator 'General Options'
 
-          opt.on('--engine <ENGINE>', 'Use ENGINE to search for (default: ' + options.engine.to_s + ')') do |o|
+          opt.on('--engine <ENGINE>', 'Use only ENGINE to search for (default: ' + options.engine.to_s + ', alternatives: ' + Request::Search.constants.map(&:to_s).map(&:downcase).join(', ')  + ')') do |o|
             options.engine = o.to_sym
           end
 
@@ -69,6 +69,13 @@ module Zypper
 
           opt.on('--timeout <SECONDS>', "Adjust the waiting SECONDS used to catch an HTTP Timeout Error (Default: #{options.timeout})") do |o|
             options.timeout = o.to_f
+          end
+
+          opt.separator ''
+          opt.separator 'View options:'
+
+          opt.on('--table', 'Show the results as a table [DEFAULT]') do |o|
+            options.view = :table
           end
 
           opt.on('--report', 'Show the results as report') do |o|
