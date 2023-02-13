@@ -14,18 +14,18 @@ Gem::Specification.new do |spec|
   spec.license       = 'GPL-3.0'
 
   spec.metadata      = {
-    "bug_tracker_uri"   => "https://github.com/fabiomux/zypper-onlinesearch/issues",
-    #"changelog_uri"     => "",
+    "bug_tracker_uri"   => 'https://github.com/fabiomux/zypper-onlinesearch/issues',
+    "changelog_uri"     => 'https://freeaptitude.altervista.org/projects/zypper-onlinesearch.html#changelog',
     "documentation_uri" => "https://www.rubydoc.info/gems/zypper-onlinesearch/#{spec.version}",
-    "homepage_uri"      => "https://github.com/fabiomux/zypper-onlinesearch",
+    "homepage_uri"      => 'https://freeaptitude.altervista.org/projects/zypper-onlinesearch.html',
     #"mailing_list_uri"  => "",
-    "source_code_uri"   => "https://github.com/fabiomux/zypper-upgraderepo",
-    "wiki_uri"          => "https://github.com/fabiomux/zypper-onlinesearch/wiki"
+    "source_code_uri"   => 'https://github.com/fabiomux/zypper-onlinesearch',
+    "wiki_uri"          => 'https://github.com/fabiomux/zypper-onlinesearch/wiki'
   }
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|.github|.gitignore)/}) }
   end
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
