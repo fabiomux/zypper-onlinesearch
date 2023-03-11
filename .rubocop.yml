@@ -1,0 +1,72 @@
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+  - '**/_OLD/**'
+
+Style/ClassVars:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Layout/LineLength:
+  Max: 120
+
+Naming/FileName:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Lint/DuplicateBranch:
+  Enabled: false
+
+Metrics/ClassLength:
+  Exclude:
+  - './lib/**/cli.rb'
+  - './lib/**/onlinesearch.rb'
+
+Metrics/BlockLength:
+  Exclude:
+  - './lib/**/cli.rb'
+  - './lib/**/onlinesearch.rb'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+  - './lib/**/onlinesearch.rb'
+  - './lib/**/data.rb'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+  - './lib/**/onlinesearch.rb'
+  - './lib/**/data.rb'
+
+Lint/UriEscapeUnescape:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Exclude:
+  - './lib/**/data.rb'
+
+Security/MarshalLoad:
+  Exclude:
+  - './lib/**/cache.rb'
+
+Style/SingleLineMethods:
+  Exclude:
+  - './lib/**/utils.rb'
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+  - './bin/*'
+  - './exe/*'

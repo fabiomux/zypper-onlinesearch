@@ -1,30 +1,32 @@
-require 'iniparse'
+# frozen_string_literal: true
+
+require "iniparse"
 
 module Zypper
   module Onlinesearch
-
+    #
+    # Current release classification.
+    #
     class Release
-
-
-      def initialize()
-        @filename = File.exist?('/etc/SuSE-release') ? '/etc/SuSE-release' : '/etc/os-release'
+      def initialize
+        @filename = File.exist?("/etc/SuSE-release") ? "/etc/SuSE-release" : "/etc/os-release"
         @ini = IniParse.parse(File.read(@filename))
       end
 
       def name
-        ini['NAME'].delete('"')
+        ini["NAME"].delete('"')
       end
 
       def version
-        ini['VERSION'].delete('"')
+        ini["VERSION"].delete('"')
       end
 
       def id
-        ini['ID'].delete('"')
+        ini["ID"].delete('"')
       end
 
       def pretty_name
-        ini['PRETTY_NAME'].delete('"')
+        ini["PRETTY_NAME"].delete('"')
       end
 
       def arch
@@ -34,9 +36,8 @@ module Zypper
       private
 
       def ini
-        @ini['__anonymous__']
+        @ini["__anonymous__"]
       end
     end
-
   end
 end

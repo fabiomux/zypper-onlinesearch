@@ -1,223 +1,255 @@
+# frozen_string_literal: true
+
 module Zypper
   module Onlinesearch
-
     module View
-
-      TYPE_COLORS = { experimental: :yellow, supported: :green, community: :red }
+      TYPE_COLORS = { experimental: :yellow, supported: :green, community: :red }.freeze
       SEPARATOR_LENGTH = 100
 
-
+      #
+      # Cache clean view.
+      #
       class CacheClean
         def self.reset(size)
-          puts "Cache cleared! " + size.to_f.to_human.bold.red + ' freed.'
+          puts "Cache cleared! #{size.to_f.to_human.bold.red} freed."
         end
       end
 
-
       module Search
-
+        #
+        # Common methods for the search operation.
+        #
         class Common
-
           def self.separator
-            puts '-' * SEPARATOR_LENGTH
+            puts "-" * SEPARATOR_LENGTH
           end
 
           def self.no_packages
-            puts  (' ' * 3) + ' - | No packages found!'
-            self.separator
+            puts "#{" " * 3} - | No packages found!"
+            separator
           end
 
           def self.no_compatible_packages
-            puts  (' ' * 3) + ' - | No compatible packages found!'
-            self.separator
+            puts "#{" " * 3} - | No compatible packages found!"
+            separator
           end
 
           def self.parameters(args)
-            puts ''
-            puts '=' * SEPARATOR_LENGTH
-            puts 'Parameters: '.bold + 'Engine: ' + args[:engine].to_s.bold.red + ' | ' +
-                 'Query: ' + args[:query].bold + ' | ' +
-                 'Cache: ' + (args[:cached] ? "#{'On'.bold.yellow} (#{args[:cache_time] ? args[:cache_time].strftime('%Y-%m-%d %H:%M') : 'Now'})" : 'Off'.bold)
-            puts '=' * SEPARATOR_LENGTH
+            engine = args[:engine].bold.red
+            query = args[:query].bold
+            cache = if args[:refresh]
+                      "Off".bold
+                    elsif args[:cache_time]
+                      "#{"On".bold.yellow} (#{args[:cache_time].strftime("%Y-%m-%d %H:%M")})"
+                    else
+                      "#{"On".bold.yellow} (Now)"
+                    end
+
+            puts ""
+            puts "=" * SEPARATOR_LENGTH
+            puts "#{"Parameters:".bold} Engine: #{engine} | Query: #{query} | Cache: #{cache}"
+            puts "=" * SEPARATOR_LENGTH
           end
         end
 
+        #
+        # Report view for the search operation.
+        #
         class Report < Common
-
-          def self.header(args)
-            puts ' ' * 3 + ' # | Info '
-            self.separator
+          def self.header(_args)
+            puts "#{" " * 3} # | Info"
+            separator
           end
 
           def self.package(args)
             name = args[:name]
-            name = (name =~ / /) ? (name.split(' ').map.with_index { |x, i| x = x.bold if i == 0; x }.join ' ') : name.bold
+            name = if name =~ / /
+                     name.split.map.with_index do |x, i|
+                       x = x.bold if i.zero?
+                       x
+                     end.join " "
+                   else
+                     name.bold
+                   end
 
-            puts "#{' ' * (5 - args[:num].to_s.length)}" + args[:num].to_s + ' | Page: ' + name
-            puts "#{' ' * 5}" + ' | Description: ' + args[:description].to_s
-            self.separator
+            puts "#{" " * (5 - args[:num].to_s.length)}#{args[:num]} | Page: #{name}"
+            puts "#{" " * 5} | Description: #{args[:description]}"
+            separator
           end
         end
 
-
+        #
+        # Table view for search operation.
+        #
         class Table < Common
-
           def self.header(args)
             @@first_col = args[:first_col]
-            n_length = ( args[:first_col] - 4 ) / 2
+            nl = (args[:first_col] - 4) / 2
 
-            puts (' ' * 4) + '#' +
-                 ' | ' + (' ' * n_length) + 'Page' + (' ' * n_length) +
-                 ' | Description '
-            self.separator
+            puts "#{" " * 4}# | #{" " * nl} Page#{" " * nl} | Description"
+            separator
           end
 
           def self.package(args)
             name = args[:name]
-            name = (name =~ / /) ? (name.split(' ').map.with_index { |x, i| x = x.bold if i == 0; x }.join ' ') : name.bold
+            name = if name =~ / /
+                     name.split.map.with_index do |x, i|
+                       x = x.bold if i.zero?
+                       x
+                     end.join " "
+                   else
+                     name.bold
+                   end
 
-            puts (' ' * (5 - args[:num].to_s.length)) + args[:num].to_s +
-                 ' | ' + name + (' ' * (@@first_col - args[:name].length)) +
-                 ' | ' + args[:description]
-            self.separator
+            nl = 5 - args[:num].to_s.length
+            fl = @@first_col - args[:name].length
+            puts "#{" " * nl}#{args[:num]} | #{name}#{" " * fl} | #{args[:description]}"
+            separator
           end
-
         end
 
         class Urls < Table
-
         end
-
       end
 
-
       module Page
-
+        #
+        # Common view elements for page operation.
+        #
         class Common
-
           def self.separator
-            puts '-' * SEPARATOR_LENGTH
+            puts "-" * SEPARATOR_LENGTH
           end
 
           def self.general(args)
-            puts ''
-            puts '=' * SEPARATOR_LENGTH
-            puts 'Parameters:  '.bold +
-                 'Engine: ' + args[:engine].bold.red + ' | ' +
-                 'OS: ' + args[:distro].bold.blue + ' | ' +
-                 'Architecture: ' + PageData::FORMATS[args[:architecture]].bold + ' | ' +
-                 'Cache: ' + (args[:refresh] ? 'Off'.bold : "#{'On'.bold.yellow} (#{args[:cache_time] ? args[:cache_time].strftime('%Y-%m-%d %H:%M') : args[:cache_time].strftime('%Y-%m-%d %H:%M')})")
-            puts '=' * SEPARATOR_LENGTH
-            puts 'Name:        '.bold + args[:name]
-            puts 'Summary:     '.bold + args[:short_description] if args[:short_description]
-            puts 'Description: '.bold + args[:description].chomp if args[:description]
+            engine = args[:engine].bold.red
+            distro = args[:distro].bold.blue
+            arch = PageData::FORMATS[args[:architecture]].bold
+            cache = if args[:refresh]
+                      "Off".bold
+                    elsif args[:cache_time]
+                      "#{"On".bold.yellow} (#{args[:cache_time].strftime("%Y-%m-%d %H:%M")})"
+                    else
+                      "#{"On".bold.yellow} (Now)"
+                    end
 
+            puts ""
+            puts "=" * SEPARATOR_LENGTH
+            puts "#{"Parameters: ".bold} Engine: #{engine} | OS: #{distro} | Architecture: #{arch} | Cache: #{cache}"
+            puts "=" * SEPARATOR_LENGTH
+            puts "#{"Name:        ".bold}#{args[:name]}"
+            puts "#{"Summary:     ".bold}#{args[:short_description]}" if args[:short_description]
+            puts "#{"Description: ".bold}#{args[:description].chomp}" if args[:description]
           end
 
           def self.no_packages(compatible)
-            self.separator
-            puts (' ' * 3) + ' - | No ' + (compatible ? 'compatible ' : '' ) + 'packages found!'
-            self.separator
+            separator
+            puts "#{" " * 3} - | No #{compatible ? "compatible" : ""} packages found!"
+            separator
           end
 
           def self.no_item(num)
-            self.separator
-            puts (' ' * 3) + ' - | Invalid item number ' + num.to_s
+            separator
+            puts "#{" " * 3} - | Invalid item number #{num}"
           end
         end
 
-
+        #
+        # Table view for page operation.
+        #
         class Table < Common
-
           def self.header(args)
             @@first_col = args[:first_col]
             @@second_col = args[:second_col]
-            first_col = ((args[:first_col] - 4) / 2)
-            second_col = (args[:second_col] > 0) ? ((args[:second_col] - 6) / 2) : 0
 
-            self.separator
-            if second_col > 0
-              puts "#{' ' * 3} # | Version | #{' ' * first_col}Repo #{' ' * first_col} | #{' ' * second_col} Distro #{' '  * second_col}" # | Formats"
+            first_col = (args[:first_col] - 4) / 2
+            second_col = args[:second_col].positive? ? ((args[:second_col] - 6) / 2) : 0
+            np = " " * 3
+            fcp = " " * first_col
+            scp = " " * second_col
+
+            separator
+            if second_col.positive?
+              puts "#{np} # | Version | #{fcp}Repo #{fprefix} | #{scp} Distro #{scp}"
             else
-              puts "#{' ' * 3} # | Version | #{' ' * first_col}Repo #{' ' * first_col}" # | Formats"
+              puts "#{np} # | Version | #{fcp}Repo"
             end
-            self.separator
+            separator
           end
 
           def self.package(args)
-            r_length = @@first_col - args[:pack][:repo].to_s.length
-            n_length = args[:num].to_s.length
-            d_length = @@second_col > 0 ? @@second_col - args[:pack][:distro].to_s.length : 0
-
             num = args[:num].to_s.bold.send(TYPE_COLORS[args[:pack][:type]])
             repo = args[:pack][:repo].bold.send(TYPE_COLORS[args[:pack][:type]])
-            distro = (args[:args][:distro] == args[:pack][:distro] ? args[:pack][:distro].bold.blue : args[:pack][:distro])
+            distro = if args[:args][:distro] == args[:pack][:distro]
+                       args[:pack][:distro].bold.blue
+                     else
+                       args[:pack][:distro]
+                     end
             version = args[:pack][:version].to_s[0..6]
 
-            if @@second_col > 0
-              puts (' ' * (5 - n_length)) + num +
-                ' | ' + (' ' * ( 7 - version.length )) + version +
-                ' | ' + repo.to_s + (' ' * r_length) +
-                ' | ' + distro + (' ' * d_length) # +
+            nl = 5 - args[:num].to_s.length
+            rl = @@first_col - args[:pack][:repo].to_s.length
+            dl = @@second_col.positive? ? @@second_col - args[:pack][:distro].to_s.length : 0
+            vl = 7 - version.length
+
+            if @@second_col.positive?
+              puts "#{" " * nl}#{num} | #{" " * vl}#{version} | #{repo}#{" " * rl} | #{distro}#{" " * dl}"
             else
-              puts (' ' * (5 - n_length)) + num +
-                ' | ' + (' ' * ( 7 - version.length )) + version +
-                ' | ' + repo.to_s + (' ' * r_length)  #+
+              puts "#{" " * nl}#{num} | #{" " * vl}#{version} | #{repo}"
             end
-
-            self.separator
+            separator
           end
-
         end
 
-
+        #
+        # Report view for page operation.
+        #
         class Report < Common
-
           def self.header(args)
             @@second_col = args[:second_col]
-            self.separator
-            puts "#{' ' * 3} # | Info"
-            self.separator
+            separator
+            puts "#{" " * 3} # | Info"
+            separator
           end
 
           def self.package(args)
             n_length = args[:num].to_s.length
-
-            #p args
             num = args[:num].to_s.bold.send(TYPE_COLORS[args[:pack][:type]])
             repo = args[:pack][:repo].bold.send(TYPE_COLORS[args[:pack][:type]])
-            distro = (args[:args][:distro] == args[:pack][:distro] ? args[:pack][:distro].bold.blue : args[:pack][:distro])
+            distro = if args[:args][:distro] == args[:pack][:distro]
+                       args[:pack][:distro].bold.blue
+                     else
+                       args[:pack][:distro]
+                     end
             version = args[:pack][:version].to_s
+            type = args[:pack][:type].to_s.capitalize.bold.send(TYPE_COLORS[args[:pack][:type]])
+            prefix = " " * 5
 
-            puts (' ' * (5 - n_length)) + num.to_s + ' | Version: ' + version
-            puts (' ' * 5) + ' | Repository: ' + repo
-            puts (' ' * 5) + ' | Distribution: ' + distro if @@second_col > 0
-            #puts (' ' * 5) + ' | Formats: ' + args[:formats].join(', ')
-            puts (' ' * 5) + ' | Type: ' + args[:pack][:type].to_s.capitalize.bold.send(TYPE_COLORS[args[:pack][:type]])
-            self.separator
+            puts "#{" " * (5 - n_length)}#{num} | Version: #{version}"
+            puts "#{prefix} | Repository: #{repo}"
+            puts "#{prefix} | Distribution: #{distro}" if @@second_col.positive?
+            # puts #{prefix} | Formats: ' + args[:formats].join(', ')
+            puts "#{prefix} | Type: #{type}"
+            separator
           end
-
         end
-
 
         class Urls < Table
-
         end
-
-      end # Module Page
-
+      end
 
       module Links
-
+        #
+        # Common class for links view.
+        #
         class Common < Page::Common
-
           def self.info_package(args)
-            self.separator
-            puts 'Selected Item: '.bold +
-                 'Repository: ' + args[:repo].bold.send(TYPE_COLORS[args[:type]]) + ' | ' +
-                 'Distribution: ' + args[:distro].bold + ' | ' +
-                 'Version: ' + args[:version].bold
-            self.separator
+            separator
+            repo = args[:repo].bold.send(TYPE_COLORS[args[:type]])
+            distro = args[:distro].bold
+            ver = args[:version].bold
+            puts "#{"Selected Item:".bold} Repository: #{repo} | Distribution: #{distro} | Version: #{ver}"
+            separator
           end
 
           def self.header(args)
@@ -225,72 +257,73 @@ module Zypper
           end
         end
 
+        #
+        # Table view for links operation.
+        #
         class Table < Common
-
           def self.header(args)
             super args
-            self.separator
-            puts (' ' * 3) + ' # | Format | Link'
-            self.separator
+            separator
+            puts "#{" " * 3} # | Format | Link"
+            separator
           end
 
-          def self.package(args)
-          end
+          def self.package(args); end
 
           def self.link(args)
-            #puts args,@@first_col
-            n_length = args[:num].to_s.length
-            puts (' ' * (5 - n_length)) + args[:num].to_s + ' | ' +
-              (' ' * (6 - args[:pack][:format].to_s.length)) + args[:pack][:format].to_s + ' | ' + args[:pack][:link]
-            self.separator
+            nl = args[:num].to_s.length
+            fl = args[:pack][:format].to_s.length
+            puts "#{" " * (5 - nl)}#{args[:num]} | #{" " * (6 - fl)}#{args[:pack][:format]} | #{args[:pack][:link]}"
+            separator
           end
         end
 
+        #
+        # Report view for links operation.
+        #
         class Report < Common
-
-          def self.header(args)
-            self.separator
-            puts "#{' ' * 3} # | Links"
-            self.separator
+          def self.header(_args)
+            separator
+            puts "#{" " * 3} # | Links"
+            separator
           end
 
           def self.link(args)
-            alt_format = args[:pack][:format].to_s == PageData::FORMATS[args[:pack][:format]] ? '' : " (#{PageData::FORMATS[args[:pack][:format]]})"
+            alt_format = if args[:pack][:format].to_s == PageData::FORMATS[args[:pack][:format]]
+                           ""
+                         else
+                           " (#{PageData::FORMATS[args[:pack][:format]]})"
+                         end
             n_length = args[:num].to_s.length
-            puts (' ' * (5 - n_length)) + args[:num].to_s + ' | Format: ' + args[:pack][:format].to_s.bold + alt_format
-            puts (' ' * 5) + ' | Distribution: ' + args[:pack][:distro]
-            puts (' ' * 5) + ' | Link: ' + args[:pack][:link]
+            puts "#{" " * (5 - n_length)}#{args[:num]} | Format: #{args[:pack][:format].to_s.bold}#{alt_format}"
+            puts "#{" " * 5} | Distribution: #{args[:pack][:distro]}"
+            puts "#{" " * 5} | Link: #{args[:pack][:link]}"
 
-            self.separator
+            separator
           end
         end
 
+        #
+        # URLs view for links operation.
+        #
         class Urls
-          def self.general(args)
-          end
+          def self.general(args); end
 
-          def self.info_package(args)
-          end
+          def self.info_package(args); end
 
-          def self.header(args)
-          end
+          def self.header(args); end
 
-          def self.separator
-          end
+          def self.separator; end
 
-          def self.package(args)
-          end
+          def self.package(args); end
 
           def self.link(args)
             puts args[:pack][:link]
           end
 
-          def self.no_packages(args)
-          end
+          def self.no_packages(args); end
         end
-
-      end # Module Links
-
+      end
     end
   end
 end
