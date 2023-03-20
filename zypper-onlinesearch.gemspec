@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "zypper/onlinesearch/version"
+require_relative "lib/zypper/onlinesearch/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "zypper-onlinesearch"
