@@ -32,21 +32,25 @@ Lint/DuplicateBranch:
   Enabled: false
 
 Metrics/ClassLength:
+  Enabled: true
   Exclude:
   - './lib/**/cli.rb'
   - './lib/**/onlinesearch.rb'
 
 Metrics/BlockLength:
+  Enabled: true
   Exclude:
   - './lib/**/cli.rb'
   - './lib/**/onlinesearch.rb'
 
 Metrics/PerceivedComplexity:
+  Enabled: true
   Exclude:
   - './lib/**/onlinesearch.rb'
   - './lib/**/data.rb'
 
 Metrics/CyclomaticComplexity:
+  Enabled: true
   Exclude:
   - './lib/**/onlinesearch.rb'
   - './lib/**/data.rb'
@@ -55,18 +59,22 @@ Lint/UriEscapeUnescape:
   Enabled: false
 
 Metrics/ParameterLists:
+  Enabled: true
   Exclude:
   - './lib/**/data.rb'
 
 Security/MarshalLoad:
+  Enabled: true
   Exclude:
   - './lib/**/cache.rb'
 
 Style/SingleLineMethods:
+  Enabled: true
   Exclude:
   - './lib/**/utils.rb'
 
 Style/FrozenStringLiteralComment:
+  Enabled: true
   Exclude:
   - './bin/*'
   - './exe/*'
