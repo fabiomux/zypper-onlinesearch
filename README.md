@@ -6,6 +6,9 @@ directly in your terminal.
 Basically it is just a command-line frontend to these search engines, it executes a query to them,
 arrange the results and display them in a table or report view.
 
+[![Ruby](https://github.com/fabiomux/zypper-onlinesearch/actions/workflows/main.yml/badge.svg)][wf_main]
+[![Gem Version](https://badge.fury.io/rb/zypper-onlinesearch.svg)][gem_version]
+
 ## Installation
 
 There are a couple of options to install this application.
@@ -59,4 +62,5 @@ More info is available at:
 
 [project_page]: https://freeaptitude.altervista.org/projects/zypper-onlinesearch.html "Zypper-Onlinesearch project page"
 [zypper_onlinesearch_wiki]: https://github.com/fabiomux/zypper-onlinesearch/wiki "Zypper-Onlinesearch wiki page on GitHub"
-
+[wf_main]: https://github.com/fabiomux/zypper-onlinesearch/actions/workflows/main.yml
+[gem_version]: https://badge.fury.io/rb/zypper-onlinesearch
