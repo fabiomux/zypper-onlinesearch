@@ -3,7 +3,7 @@ AllCops:
   NewCops: enable
   SuggestExtensions: false
   Exclude:
-  - '**/_OLD/**'
+  - './lib/**/_OLD/**'
 
 Style/ClassVars:
   Enabled: false
