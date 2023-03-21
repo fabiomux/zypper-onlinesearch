@@ -3,7 +3,7 @@
 module Zypper
   module Onlinesearch
     module View
-      TYPE_COLORS = { experimental: :yellow, supported: :green, community: :red }.freeze
+      TYPE_COLORS = { experimental: :yellow, supported: :green, community: :red, unsupported: :bg_red }.freeze
       SEPARATOR_LENGTH = 100
 
       #
@@ -170,7 +170,7 @@ module Zypper
 
             separator
             if second_col.positive?
-              puts "#{np} # | Version | #{fcp}Repo #{fprefix} | #{scp} Distro #{scp}"
+              puts "#{np} # | Version | #{fcp}Repo #{fcp} | #{scp} Distro #{scp}"
             else
               puts "#{np} # | Version | #{fcp}Repo"
             end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "optparse"
-require "ostruct"
 require "zypper/onlinesearch"
 require "zypper/onlinesearch/version"
 
@@ -12,7 +11,8 @@ module Zypper
     #
     class OptParseMain
       def self.parse(args)
-        options = Struct.new
+        options = Struct.new(:operation, :query, :refresh, :engine, :timeout, :formats,
+                             :distributions, :types, :number, :view, :format).new
         options.operation = :search
         options.query = ""
         options.refresh = false
@@ -20,7 +20,7 @@ module Zypper
         options.timeout = 20
         options.formats = :compatible # :all
         options.distributions = :compatible # :all
-        options.types = %i[supported community experimental]
+        options.types = %i[supported community experimental unsupported]
         options.number = 0
         options.view = :table
         options.format = :all # or single format
@@ -104,6 +104,10 @@ module Zypper
 
           opt.on("--no-community", "Hide community packages.") do
             options.types.delete :community
+          end
+
+          opt.on("--no-unsupported", "Hide unsupported packages.") do
+            options.types.delete :unsupported
           end
 
           opt.separator ""

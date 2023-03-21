@@ -141,6 +141,14 @@ module Zypper
           XPATH_EXPERIMENTAL_LINK = ".//@href"
           XPATH_EXPERIMENTAL_VERSION = '../..//div[@class="col-md-2"]'
 
+          XPATH_UNSUPPORTED = '//div[@id="unsupported-distributions"]/h4'
+
+          XPATH_UNSUPPORTED_DISTRO = "./h4"
+          XPATH_UNSUPPORTED_LABEL =
+            './/following-sibling::div[@class="card mb-2" and count(preceding-sibling::h4)=_n_]//a'
+          XPATH_UNSUPPORTED_LINK = ".//@href"
+          XPATH_UNSUPPORTED_VERSION = '../..//div[@class="col-md-2"]'
+
           def data
             res = {}
             res[:name] = @page.xpath(XPATH_NAME).text
@@ -152,6 +160,12 @@ module Zypper
               extract(ver, res, :supported, XPATH_SUPPORTED_LABEL, XPATH_SUPPORTED_VERSION, XPATH_SUPPORTED_LINK)
               extract(ver, res, :community, XPATH_COMMUNITY, XPATH_COMMUNITY_VERSION, XPATH_COMMUNITY_LINK)
               extract(ver, res, :experimental, XPATH_EXPERIMENTAL, XPATH_EXPERIMENTAL_VERSION, XPATH_EXPERIMENTAL_LINK)
+            end
+
+            @page.xpath(XPATH_UNSUPPORTED).each_with_index do |ver, i|
+              extract(ver, res, :unsupported,
+                      XPATH_UNSUPPORTED_LABEL.gsub(/_n_/, i.next.to_s),
+                      XPATH_UNSUPPORTED_VERSION, XPATH_UNSUPPORTED_LINK)
             end
 
             res
@@ -187,8 +201,8 @@ module Zypper
               link = expand_link(pack.xpath(xpath_link).text)
 
               if repo =~ /Expert Download/
-                res[:versions] << { distro: ver.text, link: link, type: type, repo: @old_repo,
-                                    format: :extra, version: version }
+                res[:versions] << { distro: ver.text.gsub(/:/, " "), link: link, type: type,
+                                    repo: @old_repo, format: :extra, version: version }
                 next
               end
 
