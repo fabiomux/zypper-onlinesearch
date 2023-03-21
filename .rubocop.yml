@@ -4,6 +4,7 @@ AllCops:
   SuggestExtensions: false
   Exclude:
   - './lib/**/_OLD/**'
+  - 'vendor/**'
 
 Style/ClassVars:
   Enabled: false
