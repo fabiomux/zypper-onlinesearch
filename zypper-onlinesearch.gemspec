@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Search for packages through the openSUSE software search website and similar."
   spec.homepage      = "https://github.com/fabiomux/zypper-onlinesearch"
   spec.license       = "GPL-3.0"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 2.5.0"
 
   spec.metadata["bug_tracker_uri"] = "https://github.com/fabiomux/zypper-onlinesearch/issues"
   spec.metadata["homepage_uri"] = spec.homepage

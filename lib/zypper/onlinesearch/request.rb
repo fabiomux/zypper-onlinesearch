@@ -45,7 +45,7 @@ module Zypper
 
       def initialize(query, refresh, timeout = 60, cookies = [])
         @query = query.strip
-        @cache = Cache.new(*self.class.to_s.split("::")[-2..].map(&:downcase))
+        @cache = Cache.new(*self.class.to_s.split("::")[-2..-1].map(&:downcase))
         @refresh = refresh
         @cookies = cookies
         @timeout = timeout
@@ -84,7 +84,7 @@ module Zypper
       end
 
       def to_data
-        klass = self.class.to_s.split("::")[-2..]
+        klass = self.class.to_s.split("::")[-2..-1]
         Data.const_get(klass[0].to_sym).const_get(klass[1].to_sym).new(@page.body).data
       end
 
@@ -223,7 +223,7 @@ module Zypper
           URL = "http://packman.links2linux.org/package/"
 
           def initialize(query, refresh, timeout = 60, cookies = [])
-            query = query.split("/")[-2..].join("/") if query =~ %r{://}
+            query = query.split("/")[-2..-1].join("/") if query =~ %r{://}
             super query, refresh, timeout, cookies
           end
 
