@@ -264,7 +264,7 @@ module Zypper
           def self.header(args)
             super args
             separator
-            puts "#{" " * 3} # | Format | Link"
+            puts "#{" " * 3} # | Format   | Link"
             separator
           end
 
@@ -273,7 +273,7 @@ module Zypper
           def self.link(args)
             nl = args[:num].to_s.length
             fl = args[:pack][:format].to_s.length
-            puts "#{" " * (5 - nl)}#{args[:num]} | #{" " * (6 - fl)}#{args[:pack][:format]} | #{args[:pack][:link]}"
+            puts "#{" " * (5 - nl)}#{args[:num]} | #{" " * (8 - fl)}#{args[:pack][:format]} | #{args[:pack][:link]}"
             separator
           end
         end
