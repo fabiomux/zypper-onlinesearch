@@ -22,7 +22,7 @@ module Zypper
                                   refresh: options.refresh,
                                   query: options.query
         @release = Release.new
-        @formats = options.formats
+        @arch = options.arch
         @distributions = options.distributions
         @format = options.format
         @types = options.types
@@ -94,7 +94,7 @@ module Zypper
             collection = collection.pop
             collection.each do |pack|
               if (pack[:link] =~ /rpm$/) || (pack[:format] == :ymp)
-                packages << pack
+                packages << pack if package_select?(pack, true)
               else
                 result = RequestList.new operation: :links,
                                          engine: engine,
@@ -110,7 +110,7 @@ module Zypper
                     f[:repo] = pack[:repo]
                     f[:version] ||= pack[:version]
                     f[:distro] ||= pack[:distro]
-                    packages << f if package_select?(f)
+                    packages << f if package_select?(f, true)
                   end
                 end
               end
@@ -154,21 +154,25 @@ module Zypper
       end
 
       def architecture
-        @formats == :compatible ? @release.arch : :all
+        @arch == :compatible ? @release.arch : :all
       end
 
-      def package_select?(package)
+      # rubocop:disable Style/OptionalBooleanParameter
+      def package_select?(package, check_format = false)
         res = true
-        res = [:ymp, :src, :extra, @release.arch].include?(package[:format]) if @formats == :compatible
-        res &&= (@format == package[:format]) unless @format == :all
+        res = [:ymp, :src, :extra, :repo, @release.arch].include?(package[:format]) if @arch == :compatible
+
         if @distributions == :compatible
           res &&= ((package[:distro] == :current) ||
                    package[:distro].match?(Regexp.new(@release.pretty_name, "i")))
         end
         res = false unless @types.include?(package[:type])
 
+        res &&= (@format == package[:format]) if @format != :all && check_format
+
         res
       end
+      # rubocop:enable Style/OptionalBooleanParameter
     end
   end
 end

@@ -11,14 +11,14 @@ module Zypper
     #
     class OptParseMain
       def self.parse(args)
-        options = Struct.new(:operation, :query, :refresh, :engine, :timeout, :formats,
+        options = Struct.new(:operation, :query, :refresh, :engine, :timeout, :arch,
                              :distributions, :types, :number, :view, :format).new
         options.operation = :search
         options.query = ""
         options.refresh = false
         options.engine = :all # :opensuse, :packman
         options.timeout = 20
-        options.formats = :compatible # :all
+        options.arch = :compatible # :all
         options.distributions = :compatible # :all
         options.types = %i[supported community experimental unsupported]
         options.number = 0
@@ -86,8 +86,8 @@ module Zypper
           opt.separator ""
           opt.separator '"Page" and "Links" options:'
 
-          opt.on("--all-formats", "Show all the available formats") do
-            options.formats = :all
+          opt.on("--all-arch", "Show all the available architectures") do
+            options.arch = :all
           end
 
           opt.on("--all-distributions", "Show all the available distributions") do
