@@ -124,7 +124,7 @@ module Zypper
           def self.general(args)
             engine = args[:engine].bold.red
             distro = args[:distro].bold.blue
-            arch = PageData::FORMATS[args[:architecture]].bold
+            arch = PageData::ARCHS[args[:architecture]].bold
             cache = if args[:refresh]
                       "Off".bold
                     elsif args[:cache_time]
@@ -135,7 +135,7 @@ module Zypper
 
             puts ""
             puts "=" * SEPARATOR_LENGTH
-            puts "#{"Parameters: ".bold} Engine: #{engine} | OS: #{distro} | Architecture: #{arch} | Cache: #{cache}"
+            puts "#{"Parameters: ".bold} Engine: #{engine} | OS: #{distro} | Arch.: #{arch} | Cache: #{cache}"
             puts "=" * SEPARATOR_LENGTH
             puts "#{"Name:        ".bold}#{args[:name]}"
             puts "#{"Summary:     ".bold}#{args[:short_description]}" if args[:short_description]
@@ -264,7 +264,7 @@ module Zypper
           def self.header(args)
             super args
             separator
-            puts "#{" " * 3} # | Format   | Link"
+            puts "#{" " * 3} # | Format |    Arch | Link"
             separator
           end
 
@@ -273,7 +273,11 @@ module Zypper
           def self.link(args)
             nl = args[:num].to_s.length
             fl = args[:pack][:format].to_s.length
-            puts "#{" " * (5 - nl)}#{args[:num]} | #{" " * (8 - fl)}#{args[:pack][:format]} | #{args[:pack][:link]}"
+            al = args[:pack][:arch].to_s.length
+            # rubocop:disable Style/LineEndConcatenation
+            puts "#{" " * (5 - nl)}#{args[:num]} | #{" " * (6 - fl)}#{args[:pack][:format]} |" +
+                 "#{" " * (8 - al)}#{args[:pack][:arch]} | #{args[:pack][:link]}"
+            # rubocop:enable Style/LineEndConcatenation
             separator
           end
         end
@@ -289,16 +293,14 @@ module Zypper
           end
 
           def self.link(args)
-            alt_format = if args[:pack][:format].to_s == PageData::FORMATS[args[:pack][:format]]
-                           ""
-                         else
-                           " (#{PageData::FORMATS[args[:pack][:format]]})"
-                         end
             n_length = args[:num].to_s.length
-            puts "#{" " * (5 - n_length)}#{args[:num]} | Format: #{args[:pack][:format].to_s.bold}#{alt_format}"
+            alt_format = PageData::FORMATS[args[:pack][:format]]
+            alt_arch = PageData::ARCHS[args[:pack][:arch]]
+
+            puts "#{" " * (5 - n_length)}#{args[:num]} | Format: #{args[:pack][:format].to_s.bold} (#{alt_format})"
+            puts "#{" " * 5} | Architecture: #{args[:pack][:arch]} (#{alt_arch})"
             puts "#{" " * 5} | Distribution: #{args[:pack][:distro]}"
             puts "#{" " * 5} | Link: #{args[:pack][:link]}"
-
             separator
           end
         end

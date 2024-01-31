@@ -8,27 +8,33 @@ module Zypper
     # Base class for page scraping.
     #
     class PageData
-      FORMATS = {
+      ARCHS = {
         aarch64: "ARM v8.x 64-bit",
         aarch64_ilp32: "ARM v8.x 64-bit ilp32 mode",
         all: "All",
         armv6l: "ARM v6",
         armv7l: "ARM v7",
-        extra: "Extra",
         i586: "Intel 32-bit",
         i686: "Intel Pentium 32-bit",
-        lang: "Language",
         lsrc: "Language source",
         noarch: "No architecture",
         ppc64le: "PowerPC 64-bit little-endian",
         ppc64: "PowerPC 64-bit",
         ppc: "PowerPC",
-        repo: "Repository",
         riscv64: "Risc v64",
         s390x: "IBM System/390",
         src: "Source",
-        x86_64: "Intel/AMD 64-bit",
-        ymp: "1 Click Install"
+        x86_64: "Intel/AMD 64-bit"
+      }.freeze
+
+      FORMATS = {
+        all: "All",
+        extra: "Extra",
+        lang: "Language",
+        repo: "Repository",
+        src: "Source",
+        ymp: "1 Click Install",
+        rpm: "RPM"
       }.freeze
 
       def initialize(page)
@@ -175,7 +181,8 @@ module Zypper
 
           def extract(ver, res, type, xpath_group, xpath_version, xpath_link)
             repo = ""
-            format = ""
+            format = :none
+            arch = :noarch
             version = nil
 
             ver.xpath(xpath_group).each do |pack|
@@ -187,8 +194,8 @@ module Zypper
                 @old_version = version
               end
 
-              if format? pack.text.strip
-                format = PageData::FORMATS.key(pack.text.strip)
+              if pack.text.strip =~ /1 Click Install/
+                format = :ymp
               else
                 repo = pack.text.strip
                 if repo.empty?
@@ -202,14 +209,14 @@ module Zypper
 
               if repo =~ /Expert Download/
                 res[:versions] << { distro: ver.text.gsub(/:/, " "), link: link, type: type,
-                                    repo: @old_repo, format: :extra, version: version }
+                                    repo: @old_repo, format: :extra, arch: arch, version: version }
                 next
               end
 
               next if format.to_s.empty? || link.include?("/package/show/")
 
               res[:versions] << { distro: ver.text, link: link, type: type, repo: repo,
-                                  format: format, version: version }
+                                  format: format, arch: arch, version: version }
             end
           end
 
@@ -230,7 +237,7 @@ module Zypper
           XPATH_PACKAGES = '//td[@id="package-details-left"]//tbody/tr'
           XPATH_VERSION = ".//td[1]"
           XPATH_DISTRO = ".//td[2]"
-          XPATH_FORMAT = ".//td[3]"
+          XPATH_ARCH = ".//td[3]"
           XPATH_LINK = ".//a/@href"
 
           def data
@@ -243,10 +250,10 @@ module Zypper
             @page.xpath(XPATH_PACKAGES).each do |pack|
               version = pack.xpath(XPATH_VERSION).text.split("-")[0].to_s
               distro = pack.xpath(XPATH_DISTRO).text.gsub(/_/, " ")
-              format = pack.xpath(XPATH_FORMAT).text.strip.to_sym
+              arch = pack.xpath(XPATH_ARCH).text.strip.to_sym
               link = pack.xpath(XPATH_LINK).text
 
-              res[:versions] << { format: format, version: version, distro: distro,
+              res[:versions] << { format: :extra, arch: arch, version: version, distro: distro,
                                   type: :supported, link: "http://packman.links2linux.org#{link}",
                                   repo: "Packman" }
             end
@@ -272,7 +279,7 @@ module Zypper
           def data
             res = { versions: [] }
 
-            extract(res, -1, XPATH_REPO, XPATH_REPO_DISTRO, XPATH_REPO_LINK)
+            extract(res, :noarch, XPATH_REPO, XPATH_REPO_DISTRO, XPATH_REPO_LINK)
             extract(res, -2, XPATH_PACKAGE_GROUP, XPATH_PACKAGE_DISTRO, XPATH_PACKAGE_LINK)
 
             res
@@ -280,7 +287,7 @@ module Zypper
 
           private
 
-          def extract(res, format_idx, xpath_group, xpath_distro, xpath_link)
+          def extract(res, arch_idx, xpath_group, xpath_distro, xpath_link)
             @page.xpath(xpath_group).each do |section|
               distro = ""
               section.xpath(xpath_distro).each do |subsection|
@@ -293,7 +300,8 @@ module Zypper
                 link = link.gsub("\n", " ").scan(%r{(https://[^ \n]+)}).pop.pop
                 res[:versions] << {
                   distro: distro,
-                  format: File.basename(link).split(".")[format_idx].to_sym,
+                  format: File.basename(link).split(".")[-1].to_sym,
+                  arch: arch_idx.is_a?(Integer) ? File.basename(link).split(".")[arch_idx].to_sym : arch_idx,
                   link: link
                 }
               end
@@ -319,18 +327,20 @@ module Zypper
               link = pack.text
               res[:versions] << {
                 distro: distro,
-                format: File.basename(link).split(".")[-2].to_sym,
+                format: File.basename(link).split(".")[-1].to_sym,
+                arch: File.basename(link).split(".")[-2].to_sym,
                 link: URL + link
               }
             end
 
             link = res[:versions].last[:link]
-            is_lang = (File.basename(link) =~ /-lang/) && (res[:versions].last[:format] == :noarch)
+            is_lang = (File.basename(link) =~ /-lang/) && (res[:versions].last[:arch] == :noarch)
 
             link = @page.xpath(XPATH_LINK_SRC).text
             res[:versions] << {
               distro: distro,
-              format: is_lang ? :lsrc : File.basename(link).split(".")[-2].to_sym,
+              format: File.basename(link).split(".")[-1].to_sym,
+              arch: is_lang ? :lsrc : File.basename(link).split(".")[-2].to_sym,
               link: URL + link
             }
 
@@ -339,6 +349,7 @@ module Zypper
               res[:versions] << {
                 distro: distro,
                 format: :ymp,
+                arch: :noarch,
                 link: URL + link
               }
             end
