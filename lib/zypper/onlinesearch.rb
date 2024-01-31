@@ -93,9 +93,7 @@ module Zypper
 
             collection = collection.pop
             collection.each do |pack|
-              if (pack[:link] =~ /rpm$/) || (pack[:format] == :ymp)
-                packages << pack if package_select?(pack, true)
-              else
+              if pack[:format] == :extra
                 result = RequestList.new operation: :links,
                                          engine: engine,
                                          timeout: @search.timeout,
@@ -113,6 +111,8 @@ module Zypper
                     packages << f if package_select?(f, true)
                   end
                 end
+              elsif package_select?(pack, true)
+                packages << pack
               end
             end
           end
@@ -157,10 +157,12 @@ module Zypper
         @arch == :compatible ? @release.arch : :all
       end
 
-      # rubocop:disable Style/OptionalBooleanParameter
-      def package_select?(package, check_format = false)
-        res = true
-        res = [:ymp, :src, :extra, :repo, @release.arch].include?(package[:format]) if @arch == :compatible
+      def package_select?(package, format_and_arch = false)
+        res = if @arch == :compatible
+                [:src, :noarch, @release.arch].include?(package[:arch])
+              else
+                format_and_arch ? (@arch == package[:arch]) : true
+              end
 
         if @distributions == :compatible
           res &&= ((package[:distro] == :current) ||
@@ -168,11 +170,10 @@ module Zypper
         end
         res = false unless @types.include?(package[:type])
 
-        res &&= (@format == package[:format]) if @format != :all && check_format
+        res &&= (@format == package[:format]) if @format != :all && format_and_arch
 
         res
       end
-      # rubocop:enable Style/OptionalBooleanParameter
     end
   end
 end
