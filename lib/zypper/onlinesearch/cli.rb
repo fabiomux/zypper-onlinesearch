@@ -86,7 +86,7 @@ module Zypper
           opt.separator ""
           opt.separator '"Page" and "Links" options:'
 
-          opt.on("--all-arch", "Show all the available architectures") do
+          opt.on("--all-architectures", "Show all the available architectures") do
             options.arch = :all
           end
 
@@ -115,6 +115,10 @@ module Zypper
 
           opt.on("--format FORMAT", "Filter for packages with the specified FORMAT") do |o|
             options.format = o.to_sym
+          end
+
+          opt.on("--architecture ARCHITECTURE", "Filter for packages with the specified ARCHITECTURE") do |o|
+            options.arch = o.to_sym
           end
 
           opt.on("--urls", "Show only the urls without headers") do
