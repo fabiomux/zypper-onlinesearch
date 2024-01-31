@@ -79,3 +79,6 @@ Style/FrozenStringLiteralComment:
   Exclude:
   - './bin/*'
   - './exe/*'
+
+Style/OptionalBooleanParameter:
+  Enabled: false
