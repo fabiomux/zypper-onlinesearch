@@ -183,7 +183,7 @@ module Zypper
           end
 
           def uri
-            URI(URL + URI.encode(@query))
+            URI(URL + URI::DEFAULT_PARSER.escape(@query))
           end
         end
 
@@ -194,7 +194,7 @@ module Zypper
           URL = "http://packman.links2linux.org/package/"
 
           def uri
-            URI(URL + URI.encode(@query))
+            URI(URL + URI::DEFAULT_PARSER.escape(@query))
           end
         end
       end
@@ -228,7 +228,7 @@ module Zypper
           end
 
           def uri
-            URI(@query =~ %r{://} ? @query : "#{URL}#{URI.encode(@query)}")
+            URI(@query =~ %r{://} ? @query : "#{URL}#{URI::DEFAULT_PARSER.escape(@query)}")
           end
         end
       end

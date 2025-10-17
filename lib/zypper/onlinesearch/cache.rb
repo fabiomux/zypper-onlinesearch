@@ -44,7 +44,7 @@ module Zypper
       private
 
       def query_to_filename(query)
-        URI.encode query.delete("./")
+        URI::DEFAULT_PARSER.escape query.delete("./")
       end
     end
   end
