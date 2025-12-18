@@ -9,28 +9,93 @@ module Zypper
     # String class patch.
     #
     class ::String
-      def black;          "\033[30m#{self}\033[0m" end
-      def red;            "\033[31m#{self}\033[0m" end
-      def green;          "\033[32m#{self}\033[0m" end
-      def yellow;         "\033[33m#{self}\033[0m" end
-      def blue;           "\033[34m#{self}\033[0m" end
-      def magenta;        "\033[35m#{self}\033[0m" end
-      def cyan;           "\033[36m#{self}\033[0m" end
-      def gray;           "\033[37m#{self}\033[0m" end
-      def bg_black;       "\033[40m#{self}\0330m"  end
-      def bg_red;         "\033[41m#{self}\033[0m" end
-      def bg_green;       "\033[42m#{self}\033[0m" end
-      def bg_brown;       "\033[43m#{self}\033[0m" end
-      def bg_blue;        "\033[44m#{self}\033[0m" end
-      def bg_magenta;     "\033[45m#{self}\033[0m" end
-      def bg_cyan;        "\033[46m#{self}\033[0m" end
-      def bg_gray;        "\033[47m#{self}\033[0m" end
-      def bold;           "\033[1m#{self}\033[22m" end
-      def reverse_color;  "\033[7m#{self}\033[27m" end
-      def cr;             "\r#{self}" end
-      def clean;          "\e[K#{self}" end
-      def new_line;       "\n#{self}" end
-      def none;           self end
+      def black
+        "\033[30m#{self}\033[0m"
+      end
+
+      def red
+        "\033[31m#{self}\033[0m"
+      end
+
+      def green
+        "\033[32m#{self}\033[0m"
+      end
+
+      def yellow
+        "\033[33m#{self}\033[0m"
+      end
+
+      def blue
+        "\033[34m#{self}\033[0m"
+      end
+
+      def magenta
+        "\033[35m#{self}\033[0m"
+      end
+
+      def cyan
+        "\033[36m#{self}\033[0m"
+      end
+
+      def gray
+        "\033[37m#{self}\033[0m"
+      end
+
+      def bg_black
+        "\033[40m#{self}\0330m"
+      end
+
+      def bg_red
+        "\033[41m#{self}\033[0m"
+      end
+
+      def bg_green
+        "\033[42m#{self}\033[0m"
+      end
+
+      def bg_brown
+        "\033[43m#{self}\033[0m"
+      end
+
+      def bg_blue
+        "\033[44m#{self}\033[0m"
+      end
+
+      def bg_magenta
+        "\033[45m#{self}\033[0m"
+      end
+
+      def bg_cyan
+        "\033[46m#{self}\033[0m"
+      end
+
+      def bg_gray
+        "\033[47m#{self}\033[0m"
+      end
+
+      def bold
+        "\033[1m#{self}\033[22m"
+      end
+
+      def reverse_color
+        "\033[7m#{self}\033[27m"
+      end
+
+      def cr
+        "\r#{self}"
+      end
+
+      def clean
+        "\e[K#{self}"
+      end
+
+      def new_line
+        "\n#{self}"
+      end
+
+      def none
+        self
+      end
     end
 
     #
@@ -92,7 +157,7 @@ module Zypper
     #
     class QueryStringTooShort < StandardError
       def initialize(query)
-        super "The query string '#{query}' is too short, be sure to use more than 3 characters."
+        super("The query string '#{query}' is too short, be sure to use more than 3 characters.")
       end
 
       def error_code
@@ -105,7 +170,7 @@ module Zypper
     #
     class TooManyRedirections < StandardError
       def initialize(url)
-        super "#{url} generates too many redirections!"
+        super("#{url} generates too many redirections!")
       end
     end
 
@@ -114,7 +179,7 @@ module Zypper
     #
     class InvalidEngine < StandardError
       def initialize(engine)
-        super "#{engine} is not a valid engine!"
+        super("#{engine} is not a valid engine!")
       end
 
       def error_code
@@ -127,7 +192,7 @@ module Zypper
     #
     class MissingItemNumber < StandardError
       def initialize
-        super "No item number has been provided!"
+        super("No item number has been provided!")
       end
     end
 
@@ -136,7 +201,7 @@ module Zypper
     #
     class EmptyCache < StandardError
       def initialize
-        super "The cache folder is already empty!"
+        super("The cache folder is already empty!")
       end
     end
 
@@ -145,7 +210,7 @@ module Zypper
     #
     class NoConnection < StandardError
       def initialize
-        super "Internet connection has some trouble"
+        super("Internet connection has some trouble")
       end
 
       def error_code
@@ -158,7 +223,7 @@ module Zypper
     #
     class Interruption < StandardError
       def initialize
-        super "Ok ok... Exiting!"
+        super("Ok ok... Exiting!")
       end
     end
 

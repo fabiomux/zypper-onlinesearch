@@ -144,7 +144,7 @@ module Zypper
 
           def self.no_packages(compatible)
             separator
-            puts "#{" " * 3} - | No #{compatible ? "compatible" : ""} packages found!"
+            puts "#{" " * 3} - | No #{compatible ? "compatible" : nil.to_s} packages found!"
             separator
           end
 
@@ -262,7 +262,7 @@ module Zypper
         #
         class Table < Common
           def self.header(args)
-            super args
+            super
             separator
             puts "#{" " * 3} # | Format |    Arch | Link"
             separator

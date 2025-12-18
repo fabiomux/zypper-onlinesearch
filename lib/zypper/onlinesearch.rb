@@ -100,7 +100,7 @@ module Zypper
                                          refresh: @search.refresh,
                                          query: pack[:link]
 
-                result.engines.each do |_k, v|
+                result.engines.each_value do |v|
                   next unless v.available?
 
                   v.to_data[:versions].each do |f|
@@ -108,10 +108,10 @@ module Zypper
                     f[:repo] = pack[:repo]
                     f[:version] ||= pack[:version]
                     f[:distro] ||= pack[:distro]
-                    packages << f if package_select?(f, true)
+                    packages << f if package_select?(f, format_and_arch: true)
                   end
                 end
-              elsif package_select?(pack, true)
+              elsif package_select?(pack, format_and_arch: true)
                 packages << pack
               end
             end
@@ -137,7 +137,7 @@ module Zypper
                             refresh: @search.refresh,
                             cache_time: args[:cache_time]
 
-        if packages.count.positive?
+        if packages.any?
           @view_class.header first_col: packages.max_column(args[:first_col]),
                              second_col: packages.max_column(args[:second_col])
 
@@ -157,7 +157,7 @@ module Zypper
         @arch == :compatible ? @release.arch : :all
       end
 
-      def package_select?(package, format_and_arch = false)
+      def package_select?(package, format_and_arch: false)
         res = if @arch == :compatible
                 [:src, :noarch, @release.arch].include?(package[:arch])
               else
@@ -165,8 +165,7 @@ module Zypper
               end
 
         if @distributions == :compatible
-          res &&= ((package[:distro] == :current) ||
-                   package[:distro].match?(Regexp.new(@release.pretty_name, "i")))
+          res &&= (package[:distro] == :current) || package[:distro].match?(Regexp.new(@release.pretty_name, "i"))
         end
         res = false unless @types.include?(package[:type])
 

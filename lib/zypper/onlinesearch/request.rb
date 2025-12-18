@@ -145,8 +145,8 @@ module Zypper
           URL = "https://software.opensuse.org/search"
 
           def initialize(query, cache, timeout, cookies = [])
-            super query, cache, timeout,
-                  cookies << "baseproject=ALL;search_devel=true;search_debug=false;search_lang=false"
+            super(query, cache, timeout,
+                  cookies << "baseproject=ALL;search_devel=true;search_debug=false;search_lang=false")
           end
 
           def uri
@@ -178,8 +178,8 @@ module Zypper
           URL = "https://software.opensuse.org/package/"
 
           def initialize(query, cache, timeout, cookies = [])
-            super query, cache, timeout,
-                  cookies << "baseproject=ALL;search_devel=true;search_debug=false;search_lang=false"
+            super(query, cache, timeout,
+                  cookies << "baseproject=ALL;search_devel=true;search_debug=false;search_lang=false")
           end
 
           def uri
@@ -208,7 +208,7 @@ module Zypper
 
           def initialize(query, refresh, timeout = 60, cookies = [])
             query = URI(query).query
-            super query, refresh, timeout, cookies
+            super
           end
 
           def uri
@@ -224,7 +224,7 @@ module Zypper
 
           def initialize(query, refresh, timeout = 60, cookies = [])
             query = query.split("/")[-2..-1].join("/") if query =~ %r{://}
-            super query, refresh, timeout, cookies
+            super
           end
 
           def uri

@@ -56,9 +56,6 @@ Metrics/CyclomaticComplexity:
   - './lib/**/onlinesearch.rb'
   - './lib/**/data.rb'
 
-Lint/UriEscapeUnescape:
-  Enabled: false
-
 Metrics/ParameterLists:
   Enabled: true
   Exclude:
@@ -68,17 +65,3 @@ Security/MarshalLoad:
   Enabled: true
   Exclude:
   - './lib/**/cache.rb'
-
-Style/SingleLineMethods:
-  Enabled: true
-  Exclude:
-  - './lib/**/utils.rb'
-
-Style/FrozenStringLiteralComment:
-  Enabled: true
-  Exclude:
-  - './bin/*'
-  - './exe/*'
-
-Style/OptionalBooleanParameter:
-  Enabled: false

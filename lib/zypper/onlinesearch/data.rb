@@ -69,7 +69,7 @@ module Zypper
             cards.each do |c|
               url = expand_link(c.xpath(XPATH_URL).text)
               name = c.xpath(XPATH_NAME).text
-              name = File.basename(url) == name ? name : "#{File.basename(url)} (#{name})"
+              name = "#{File.basename(url)} (#{name})" if File.basename(url) != name
               res << { name: name, description: c.xpath(XPATH_DESC).text.strip.gsub(/\n|\ +/, " "), url: url }
             end
 
@@ -170,7 +170,7 @@ module Zypper
 
             @page.xpath(XPATH_UNSUPPORTED).each_with_index do |ver, i|
               extract(ver, res, :unsupported,
-                      XPATH_UNSUPPORTED_LABEL.gsub(/_n_/, i.next.to_s),
+                      XPATH_UNSUPPORTED_LABEL.gsub("_n_", i.next.to_s),
                       XPATH_UNSUPPORTED_VERSION, XPATH_UNSUPPORTED_LINK)
             end
 
@@ -208,7 +208,7 @@ module Zypper
               link = expand_link(pack.xpath(xpath_link).text)
 
               if repo =~ /Expert Download/
-                res[:versions] << { distro: ver.text.gsub(/:/, " "), link: link, type: type,
+                res[:versions] << { distro: ver.text.gsub(":", " "), link: link, type: type,
                                     repo: @old_repo, format: :extra, arch: arch, version: version }
                 next
               end
@@ -249,7 +249,7 @@ module Zypper
 
             @page.xpath(XPATH_PACKAGES).each do |pack|
               version = pack.xpath(XPATH_VERSION).text.split("-")[0].to_s
-              distro = pack.xpath(XPATH_DISTRO).text.gsub(/_/, " ")
+              distro = pack.xpath(XPATH_DISTRO).text.gsub("_", " ")
               arch = pack.xpath(XPATH_ARCH).text.strip.to_sym
               link = pack.xpath(XPATH_LINK).text
 
@@ -322,7 +322,7 @@ module Zypper
 
           def data
             res = { versions: [] }
-            distro = @page.xpath(XPATH_LINK_DISTRO).text.gsub(/_/, " ")
+            distro = @page.xpath(XPATH_LINK_DISTRO).text.gsub("_", " ")
             @page.xpath(XPATH_LINK_BIN).each do |pack|
               link = pack.text
               res[:versions] << {
